@@ -16,6 +16,27 @@ exports.hospitalDetails=  (req, res) => {
     }); 
   }
 
+  exports.saveUser=(req,res)=>{
+    const consultant = req.body;
+    db.query("INSERT INTO user SET?", consultant, (err, result, field) => {
+      if (err) throw err;
+      res.send({ message: "User Add Succesfully" });
+    }); 
+  }
+  exports.getUser=(req,res)=>{
+    db.query("SELECT * FROM user", (err, result, field) => {
+      if (err) throw err;
+      res.send({ data:result,message: "User Add Succesfully" });
+    }); 
+  }
+
+  exports.getRole=(req,res)=>{
+    db.query("SELECT * FROM role", (err, result, field) => {
+      if (err) throw err;
+      res.send({ data:result, message: "User Add Succesfully" });
+    }); 
+  }
+
   exports.saveOPD=(req,res)=>{
     const opd = req.body;
  
