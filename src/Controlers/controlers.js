@@ -37,11 +37,12 @@ exports.hospitalDetails=  (req, res) => {
     }); 
   }
 
-  exports.saveOPD=(req,res)=>{
-    const opd = req.body;
+  exports.saveOPD=(req,sss)=>{
+    var opd = req.body;
     db.query( `SELECT * FROM opdrecords Where Counsultant_Id = ?`, [opd.Counsultant_Id], (err, result)=>{
       if (err) throw err;
       else{
+      
         if(result.length==0){
           opd.Token=1
         }
@@ -59,90 +60,60 @@ exports.hospitalDetails=  (req, res) => {
           else{
             opd.Token=1
           }
-
         }   
       }
 
 // for RECIPET NO
-
 db.query ("SELECT * FROM payment ORDER BY receipt_number LIMIT 1", (err,res,field)=>{
-if(err) throw err
-else{
-  let obj = {
-    payment_type: "OPD",
-    receipt_number	:res[0]['receipt_number'] +1
-  }
-  db.query("INSERT INTO payment SET? ",obj,(err,resul,field)=>{
-  if(err) throw err;
-  else {
-    opd.Payment_Recp_No=obj.receipt_number;
-    db.query ("SELECT * FROM uhid ORDER BY UHID LIMIT 1", (err,res,field)=>{
-      if(err) throw err
-      else{
-        let obj = {
-          pasent_type: "OPD",
-          UHID:res[0]['UHID']+1
+  if(err) throw err
+  else{
+    let obj = {
+      payment_type: "OPD",
+      receipt_number	:res[0]['receipt_number'] +1
+    }
+    db.query("INSERT INTO payment SET? ",obj,(err,resul,field)=>{
+    if(err) throw err;
+    else {
+      opd.Payment_Recp_No=obj.receipt_number;
+      db.query ("SELECT * FROM uhid ORDER BY UHID LIMIT 1", (err,res,field)=>{
+        if(err) throw err
+        else{
+          let obj = {
+            pasent_type: "OPD",
+            UHID:res[0]['UHID']+1
+          }
+          db.query("INSERT INTO uhid SET? ",obj,(err,resul,field)=>{
+          if(err) throw err;
+          else {
+            opd.UHID=obj.UHID
+            db.query("INSERT INTO opdrecords SET?", opd, (err, result, field) => {
+              if (err) throw err;
+              sss.send({ mes: "OPD Add Succesfully",data:opd},
+            
+              );
+            });
+          }
+           } )
         }
-        db.query("INSERT INTO uhid SET? ",obj,(err,resul,field)=>{
-        if(err) throw err;
-        else {
-          opd.UHID=obj.UHID
-        
-        }
-         } )
-      }
-      })
-  }
-   } )
+        })
 
-}
+
+    
+    }
+     } )
+  }
+  })
+  
+ 
+ 
+
+
 })
 
-console.log(opd);
 
-db.query("INSERT INTO opdrecords SET?", opd, (err, result, field) => {
-  if (err) throw err;
-  res.send({ mes: "OPD Add Succesfully" },
 
-  );
-});
-    })
-  
   }
 
     
 
-    // exports.getConsultantBydept=(req, res) => {
-    //   // console.log(req)
-    //   const serviceName = req.body.servicename;
-    //  db.query(  `SELECT * FROM servicegroup Where servicename = ?`, [serviceName], (err, result)=>{
-    //   if (err) throw err;
-    //   else{
-    //     const serviceGroup_id = result[0].id
-     
-    //     db.query(`SELECT * FROM service where serviceGroup_id = ? ` ,[serviceGroup_id] , (err, result, field) => {
-    //       if (err) throw err;
-    //       else{
-    //         res.send({ message: "Room Add Succesfully" ,data:result});
-    //       }
-    //     });
-    //   }
-    //  })  }
-  
-
-
-    // exports.getConsultant=(req, res) => {
-    //   let qrr = `SELECT * FROM consultant `;
-    //   db.query(qrr, (err, result, field) => {
-    //     if (err) throw err;
-    //     if(result.length >0){
-    //       res.send({
-    //         message: "All consultant  data",
-    //         data: result,
-    //       });
-    //     }
-    //   });
-    // };
-    
-
-  
+   
